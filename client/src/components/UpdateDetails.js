@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
-import { updateProfileDetails, getProfileDetails } from '../actions/userActions';
+import {
+	updateProfileDetails,
+	getProfileDetails
+} from '../actions/userActions';
 
 const validationSchema = Yup.object().shape({
 	email: Yup.string()
@@ -26,9 +29,12 @@ const UpdateDetails = ({ details, closeModal }) => {
 			props.setSubmitting(true);
 			dispatch(updateProfileDetails(values));
 			closeModal();
-			dispatch(getProfileDetails());
 		}
 	});
+
+	useEffect(() => {
+		dispatch(getProfileDetails());
+	}, [dispatch]);
 
 	return (
 		<form onSubmit={formik.handleSubmit} noValidate>
