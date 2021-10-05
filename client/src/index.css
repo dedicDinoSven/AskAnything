@@ -1,0 +1,13 @@
+.root {
+  margin-top: 86px;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.MuiListItemIcon-root {
+  min-width: 30px !important;
+}
