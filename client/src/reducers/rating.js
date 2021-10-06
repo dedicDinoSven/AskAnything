@@ -8,7 +8,6 @@ const initialState = {
 	rating: [],
 	likes: [],
 	dislikes: [],
-	answers: []
 };
 
 export default function ratingReducer(state = initialState, action) {
@@ -17,7 +16,6 @@ export default function ratingReducer(state = initialState, action) {
 			return { ...state, rating: action.payload };
 		case GET_QUESTION_RATINGS:
 			return {
-				...state,
 				likes: action.payload.likes,
 				dislikes: action.payload.dislikes
 			};

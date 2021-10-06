@@ -12,76 +12,76 @@ import {
 } from '../actions/ratingActions';
 
 const QuestionContainer = ({ question }) => {
-	const { _id, author, title, text, date } = question;
-
-	const { user: currentUser } = useSelector((state) => state.auth);
-	const { likes, dislikes } = useSelector((state) => state.rating);
 	const dispatch = useDispatch();
-
 	const [isLiked, setIsLiked] = useState(false);
 	const [isDisliked, setIsDisliked] = useState(false);
 
+	const { user: currentUser } = useSelector((state) => state.auth);
+	const { likes, dislikes } = useSelector((state) => state.rating);
+
 	useEffect(() => {
-		_id &&
-			dispatch(getQuestionRatings(_id)).then(() => {
-				if (currentUser) {
-					if (currentUser.id === author) {
-						if (likes.length) {
-							setIsDisliked(false);
-							setIsLiked(true);
-						}
-						if (dislikes.length) {
-							setIsLiked(false);
-							setIsDisliked(true);
-						}
-					}
-				} else {
+		question._id &&
+			dispatch(getQuestionRatings(question._id)).then(() => {
 					setIsLiked(false);
-					setIsDisliked(false);
-				}
+					setIsDisliked(false)
+					 for (let like of likes) {
+						if (currentUser && like.author === currentUser.id) {
+							setIsLiked(true);
+							break;
+						}
+					 }
+					 for (let dislike of dislikes) {
+						if (currentUser && dislike.author === currentUser.id) {
+							setIsDisliked(true);
+							break;
+						}
+					 }
 			});
-	}, [
-		dispatch,
-		_id,
-		currentUser,
-		currentUser.id.author,
-		likes.length,
-		dislikes.length
-	]);
+	}, [dispatch, question._id, likes.length, dislikes.length, currentUser]);
 
 	const likeQuestion = () => {
-		if (_id) {
-			if (!isLiked) {
-				if (isDisliked) {
-					dispatch(deleteQuestionRating(_id)).then(() => setIsDisliked(false));
-				}
-
-				dispatch(
-					createRating({ author: currentUser.id, value: 1, question: _id })
-				).then(() => setIsLiked(true));
-			} else {
-				dispatch(deleteQuestionRating(_id)).then(() => setIsLiked(false));
+		if (!isLiked) {
+			if (isDisliked) {
+				dispatch(deleteQuestionRating({ questionId: question._id, value: 0 }));
+				setIsDisliked(false);
 			}
 
-			dispatch(getQuestionRatings(_id));
+			dispatch(
+				createRating({
+					author: currentUser.id,
+					value: 1,
+					question: question._id
+				})
+			);
+			setIsLiked(true);
+		} else {
+			dispatch(deleteQuestionRating({ questionId: question._id, value: 1 }));
+			setIsLiked(false);
 		}
+
+		question._id && dispatch(getQuestionRatings(question._id));
 	};
 
 	const dislikeQuestion = () => {
-		if (_id) {
-			if (!isDisliked) {
-				if (isLiked) {
-					dispatch(deleteQuestionRating(_id)).then(() => setIsLiked(false));
-				}
-				dispatch(
-					createRating({ author: currentUser.id, value: 0, question: _id })
-				).then(() => setIsDisliked(true));
-			} else {
-				dispatch(deleteQuestionRating(_id)).then(() => setIsDisliked(false));
+		if (!isDisliked) {
+			if (isLiked) {
+				dispatch(deleteQuestionRating({ questionId: question._id, value: 1 }));
+				setIsLiked(false);
 			}
-
-			dispatch(getQuestionRatings(_id));
+			dispatch(
+				createRating({
+					author: currentUser.id,
+					value: 0,
+					question: question._id
+				})
+			);
+			setIsDisliked(true);
+		} else {
+			dispatch(deleteQuestionRating({ questionId: question._id, value: 0 }));
+			setIsDisliked(false);
 		}
+
+		question._id && dispatch(getQuestionRatings(question._id));
 	};
 
 	return (
@@ -123,15 +123,22 @@ const QuestionContainer = ({ question }) => {
 			<Grid item xs={10} md={11} lg={11}>
 				<Typography variant='body2' style={{ color: '#0000008a' }}>
 					Posted by{' '}
-					{author
-						? author.firstName && author.lastName
-							? author.firstName + ' ' + author.lastName
-							: author.email
+					{question && question.author
+						? question.author.firstName && question.author.lastName
+							? question.author.firstName + ' ' + question.author.lastName
+							: question.author.email
 						: ''}{' '}
-					- {date ? moment(date).locale('en-gb').format('LLL') : ''}
+					-{' '}
+					{question.date
+						? moment(question.date).locale('en-gb').format('LLL')
+						: ''}
 				</Typography>
-				<Typography variant='h4'>{title ? title : ''}</Typography>
-				<Typography variant='body1'>{text ? text : ''}</Typography>
+				<Typography variant='h4'>
+					{question.title ? question.title : ''}
+				</Typography>
+				<Typography variant='body1'>
+					{question.text ? question.text : ''}
+				</Typography>
 			</Grid>
 		</Grid>
 	);

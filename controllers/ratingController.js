@@ -32,7 +32,8 @@ exports.deleteQuestionRating = async (req, res) => {
 	try {
 		await Rating.findOneAndDelete({
 			question: req.params.questionId,
-			author: req.userId
+			author: req.userId,
+			value: req.query.value
 		})
 			.lean()
 			.exec();

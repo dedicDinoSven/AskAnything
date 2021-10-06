@@ -21,9 +21,9 @@ export const createRating = (data) => async (dispatch) => {
 	}
 };
 
-export const deleteQuestionRating = (questionId) => async (dispatch) => {
+export const deleteQuestionRating = ({questionId, value}) => async (dispatch) => {
 	try {
-		await axios.delete(`/rating/question/${questionId}`, jwtConfig());
+		await axios.delete(`/rating/question/${questionId}?value=${value}`, jwtConfig());
 
 		dispatch({
 			type: DELETE_QUESTION_RATING,
