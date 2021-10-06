@@ -22,52 +22,56 @@ const QuestionContainer = ({ question }) => {
 	const [isDisliked, setIsDisliked] = useState(false);
 
 	useEffect(() => {
-		question._id && dispatch(getQuestionRatings(question._id));
-		if (currentUser && likes.length) {
-			setIsLiked(true);
-		}
-
-		if (currentUser && dislikes.length) {
-			setIsDisliked(true)
-		}
-	}, [dispatch, question._id, currentUser, likes.length, dislikes.length]);
+		_id &&
+			dispatch(getQuestionRatings(_id)).then(() => {
+				if (currentUser.id === author) {
+					if (likes.length) {
+						setIsDisliked(false);
+						setIsLiked(true);
+					} else if (dislikes.length) {
+						setIsLiked(false);
+						setIsDisliked(true);
+					} else {
+						setIsLiked(false);
+						setIsDisliked(false);
+					}
+				}
+			});
+	}, [dispatch, _id, currentUser, author, likes.length, dislikes.length]);
 
 	const likeQuestion = () => {
-		if (!isLiked) {
-			if (isDisliked) {
-				dispatch(deleteQuestionRating(question._id));
+		if (_id) {
+			if (!isLiked) {
+				if (isDisliked) {
+					dispatch(deleteQuestionRating(_id)).then(() => setIsDisliked(false));
+				}
 
-				setIsDisliked(false);
+				dispatch(
+					createRating({ author: currentUser.id, value: 1, question: _id })
+				).then(() => setIsLiked(true));
+			} else {
+				dispatch(deleteQuestionRating(_id)).then(() => setIsLiked(false));
 			}
-			dispatch(
-				createRating({ author: currentUser.id, value: 1, question: _id })
-			);
-			setIsLiked(true);
-		} else {
-			dispatch(deleteQuestionRating(question._id));
-			setIsLiked(false);
-		}
 
-		question._id && dispatch(getQuestionRatings(question._id));
+			dispatch(getQuestionRatings(_id));
+		}
 	};
 
 	const dislikeQuestion = () => {
-		if (!isDisliked) {
-			if (isLiked) {
-				dispatch(deleteQuestionRating(question._id));
-
-				setIsLiked(false);
+		if (_id) {
+			if (!isDisliked) {
+				if (isLiked) {
+					dispatch(deleteQuestionRating(_id)).then(() => setIsLiked(false));
+				}
+				dispatch(
+					createRating({ author: currentUser.id, value: 0, question: _id })
+				).then(() => setIsDisliked(true));
+			} else {
+				dispatch(deleteQuestionRating(_id)).then(() => setIsDisliked(false));
 			}
-			dispatch(
-				createRating({ author: currentUser.id, value: 0, question: _id })
-			);
-			setIsDisliked(true);
-		} else {
-			dispatch(deleteQuestionRating(question._id));
-			setIsDisliked(false);
-		}
 
-		question._id && dispatch(getQuestionRatings(question._id));
+			dispatch(getQuestionRatings(_id));
+		}
 	};
 
 	return (
@@ -85,7 +89,7 @@ const QuestionContainer = ({ question }) => {
 				</Typography>
 				<IconButton
 					size='small'
-					style={isLiked && likes.length ? { color: 'green' } : { color: 'black' }}
+					style={isLiked ? { color: 'green' } : { color: 'black' }}
 					onClick={() => {
 						currentUser && likeQuestion();
 					}}>
@@ -96,7 +100,7 @@ const QuestionContainer = ({ question }) => {
 				</Typography>
 				<IconButton
 					size='small'
-					style={isDisliked && dislikes.length ? { color: 'red' } : { color: 'black' }}
+					style={isDisliked ? { color: 'red' } : { color: 'black' }}
 					onClick={() => {
 						currentUser && dislikeQuestion();
 					}}>

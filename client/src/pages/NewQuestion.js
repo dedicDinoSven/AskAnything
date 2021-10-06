@@ -31,8 +31,9 @@ const NewQuestion = () => {
 		const { title, text } = values;
 		try {
 			props.setSubmitting(true);
-			dispatch(createQuestion(title, text));
-			setSuccessful(true);
+			dispatch(createQuestion(title, text)).then(() => {
+				setSuccessful(true);
+			});
 		} catch (err) {
 			console.log(err);
 		}

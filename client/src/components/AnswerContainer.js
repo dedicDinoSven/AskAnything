@@ -61,7 +61,7 @@ const AnswerContainer = ({ answer, getQuestion }) => {
 
 	useEffect(() => {
 		getRatings(_id, question);
-	}, [_id, question]);
+	});
 
 	const updateAnswerHandler = (values, props) => {
 		props.setSubmitting(false);
@@ -70,11 +70,11 @@ const AnswerContainer = ({ answer, getQuestion }) => {
 				props.setSubmitting(false);
 				props.resetForm();
 				getQuestion(question);
+				setOpen(false);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
-		setOpen(false);
 	};
 
 	const deleteAnswerHandler = () => {
@@ -91,9 +91,12 @@ const AnswerContainer = ({ answer, getQuestion }) => {
 		let answerId = _id;
 
 		if (!isLiked) {
-			dispatch(createRating({ author: currentUser.id, value: 1, answer: _id }));
-			setLikes(likes + 1);
-			setIsLiked(true);
+			dispatch(
+				createRating({ author: currentUser.id, value: 1, answer: _id })
+			).then(() => {
+				setLikes(likes + 1);
+				setIsLiked(true);
+			});
 
 			if (isDisliked) {
 				await axios.delete(
@@ -113,9 +116,12 @@ const AnswerContainer = ({ answer, getQuestion }) => {
 	const dislikeAnswer = async () => {
 		let answerId = _id;
 		if (!isDisliked) {
-			dispatch(createRating({ author: currentUser.id, value: 0, answer: _id }));
-			setDislikes(dislikes + 1);
-			setIsDisliked(true);
+			dispatch(
+				createRating({ author: currentUser.id, value: 0, answer: _id })
+			).then(() => {
+				setDislikes(dislikes + 1);
+				setIsDisliked(true);
+			});
 
 			if (isLiked) {
 				await axios.delete(

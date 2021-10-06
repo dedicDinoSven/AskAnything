@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	updateProfileDetails,
 	getProfileDetails
@@ -15,26 +15,25 @@ const validationSchema = Yup.object().shape({
 		.required('Email is required!')
 });
 
-const UpdateDetails = ({ details, closeModal }) => {
+const UpdateDetails = ({ closeModal }) => {
 	const dispatch = useDispatch();
+	const details = useSelector((state) => state.user);
 
 	const formik = useFormik({
 		initialValues: {
-			firstName: details.firstName,
-			lastName: details.lastName,
-			email: details.email
+			firstName: details && details.user.firstName,
+			lastName: details && details.user.lastName,
+			email: details && details.user.email
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values, props) => {
 			props.setSubmitting(true);
-			dispatch(updateProfileDetails(values));
-			closeModal();
+			dispatch(updateProfileDetails(values)).then(() => {
+				dispatch(getProfileDetails());
+				closeModal();
+			});
 		}
 	});
-
-	useEffect(() => {
-		dispatch(getProfileDetails());
-	}, [dispatch]);
 
 	return (
 		<form onSubmit={formik.handleSubmit} noValidate>

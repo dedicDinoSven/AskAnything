@@ -26,8 +26,8 @@ const UpdatePassword = ({ closeModal }) => {
 		validationSchema: validationSchema,
 		onSubmit: (values, props) => {
 			props.setSubmitting(true);
-			dispatch(updatePassword(values.password));
-			closeModal();
+			dispatch(updatePassword(values.password))
+				.then(() =>	closeModal());
 		}
 	});
 

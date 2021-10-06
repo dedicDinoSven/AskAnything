@@ -46,8 +46,7 @@ const useStyles = makeStyles({
 		border: '4px solid #fff',
 		boxShadow: '0 2px 5px rgba(0, 0, 0, 0.5)',
 		marginTop: '30px'
-	},
-
+	}
 });
 
 const Profile = () => {
@@ -81,8 +80,10 @@ const Profile = () => {
 			const apiUrl = 'https://api.cloudinary.com/v1_1/dctpgmg8g/image/upload';
 			const res = await axios.post(apiUrl, formData);
 
-			dispatch(updateProfileDetails({ avatarUrl: res.data.url }));
-			dispatch(getProfileDetails());
+			dispatch(updateProfileDetails({ avatarUrl: res.data.url })).then(() => {
+				dispatch(getProfileDetails());
+				setImage('');
+			});
 		} catch (err) {
 			console.log(err.response);
 		}
@@ -101,8 +102,11 @@ const Profile = () => {
 								</ListItemIcon>
 								<ListItemText
 									primary={
-										details.user &&
-										details.user.firstName + ' ' + details.user.lastName
+										details.user
+											? details.user.firstName && details.user.lastName
+												? details.user.firstName + ' ' + details.user.lastName
+												: ''
+											: ''
 									}
 									secondary='Full Name'
 								/>
@@ -112,7 +116,7 @@ const Profile = () => {
 									<FontAwesomeIcon icon={faAt} />
 								</ListItemIcon>
 								<ListItemText
-									primary={details.user && details.user.email}
+									primary={details.user ? details.user.email : ''}
 									secondary='Email'
 								/>
 							</ListItem>
@@ -121,7 +125,7 @@ const Profile = () => {
 									<FontAwesomeIcon icon={faQuestion} />
 								</ListItemIcon>
 								<ListItemText
-									primary={details && details.numberOfQuestions}
+									primary={details ? details.numberOfQuestions : '0'}
 									secondary='Questions'
 								/>
 							</ListItem>
@@ -130,7 +134,7 @@ const Profile = () => {
 									<FontAwesomeIcon icon={faPen} />
 								</ListItemIcon>
 								<ListItemText
-									primary={details && details.numberOfAnswers}
+									primary={details ? details.numberOfAnswers : '0'}
 									secondary='Answers'
 								/>
 							</ListItem>
@@ -141,7 +145,7 @@ const Profile = () => {
 							className={classes.avatar}
 							src={details.user ? details.user.avatarUrl : ''}
 						/>
-						<div style={{margin: '6px 0px'}}>
+						<div style={{ margin: '6px 0px' }}>
 							<input
 								type='file'
 								accept='image/*'
@@ -191,10 +195,7 @@ const Profile = () => {
 				title='Edit User Details'
 				open={openUpdateDetails}
 				onClose={() => setOpenUpdateDetails(false)}>
-				<UpdateDetails
-					closeModal={() => setOpenUpdateDetails(false)}
-					details={details && details.user}
-				/>
+				<UpdateDetails closeModal={() => setOpenUpdateDetails(false)} />
 			</Modal>
 			<Modal
 				title='Change Password'

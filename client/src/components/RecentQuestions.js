@@ -71,7 +71,7 @@ const RecentQuestions = () => {
 											: ''}
 									</TableCell>
 									<TableCell align='right'>
-										{moment(question.date).locale('en-gb').format('LLL')}
+										{question.date && moment(question.date).locale('en-gb').format('LLL')}
 									</TableCell>
 								</TableRow>
 							))}
