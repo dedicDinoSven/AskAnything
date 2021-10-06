@@ -24,17 +24,17 @@ const QuestionContainer = ({ question }) => {
 	useEffect(() => {
 		_id &&
 			dispatch(getQuestionRatings(_id)).then(() => {
-				if (currentUser.id === author) {
+				if (currentUser && currentUser.id === author) {
 					if (likes.length) {
 						setIsDisliked(false);
 						setIsLiked(true);
 					} else if (dislikes.length) {
 						setIsLiked(false);
 						setIsDisliked(true);
-					} else {
-						setIsLiked(false);
-						setIsDisliked(false);
 					}
+				} else {
+					setIsLiked(false);
+					setIsDisliked(false);
 				}
 			});
 	}, [dispatch, _id, currentUser, author, likes.length, dislikes.length]);

@@ -91,6 +91,9 @@ exports.mostAnswersList = async (req, res) => {
 				$sort: { answersCount: -1 } 
 			},
 			{
+				$limit: 10
+			},
+			{
 				$project: {
 					'_id.password': 0,
 					'_id.__v': 0
